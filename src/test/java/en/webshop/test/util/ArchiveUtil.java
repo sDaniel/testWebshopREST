@@ -9,7 +9,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public abstract class ArchiveUtil {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ArchiveUtil.class);
 	private static final String PROJEKT_NAME = "webshop";
