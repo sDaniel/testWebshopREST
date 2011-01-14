@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-default-skin</artifactId>
+		<version>1.0</version>
+	</skin>
+
+	<body>
+		<menu name="testSwe2Web">
+			<item name="Startseite" href="index.html"/>
+			<item name="Zusammenfassung" href="project-summary.html"/>
+			<item name="&Uuml;bersicht" href="project-info.html"/>
+			<item name="Abh&auml;ngigkeiten" href="dependencies.html"/>
+			<item name="Berichte" href="project-reports.html"/>
+			<item name="Projektteam" href="team-list.html"/>
+		</menu>
+	</body>
+</project>

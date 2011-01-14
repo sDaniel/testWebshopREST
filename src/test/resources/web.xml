@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	<display-name>webshopREST</display-name>
+	<!-- -->
+	<context-param>
+		<param-name>resteasy.jndi.resources</param-name>
+		<param-value>
+			  	test/OrderManagementResourceEJB/local,
+			  	test/ArticleManagementResourceEJB/local,
+			  	test/ProfileManagementResourceEJB/local
+  		</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.providers</param-name>
+		<param-value>
+			org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider,
+		    en.webshop.orderManagement.rest.OrderValidationExceptionMapper,
+		    en.webshop.orderManagement.rest.OrderManagementExceptionMapper,
+		    en.webshop.articleManagement.rest.ArticleValidationExceptionMapper,
+		    en.webshop.articleManagement.rest.ArticleManagementExceptionMapper,
+		    en.webshop.profileManagement.rest.ProfileValidationExceptionMapper,
+		    en.webshop.profileManagement.rest.ProfileManagementExceptionMapper,
+		    en.webshop.util.NotFoundExceptionMapper
+    	</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.use.builtin.providers</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<context-param>
+		<param-name>resteasy.role.based.security</param-name>
+		<param-value>true</param-value>
+	</context-param>
+	<servlet>
+		<servlet-name>rest</servlet-name>
+		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>rest</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+	
+<!-- 
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Kunden durch ein "Formular" erzeugen</web-resource-name>
+			<url-pattern>/profileManagement/kunden/form</url-pattern>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+
+	</security-constraint>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Kunden loeschen</web-resource-name>
+			<url-pattern>/profileManagement/kunden/*</url-pattern>
+			<http-method>DELETE</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Bestellungen anzeigen</web-resource-name>
+			<url-pattern>/articleManagement/bestellungen/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Bestellungen erzeugen</web-resource-name>
+			<url-pattern>/bestellverwaltung/bestellungen</url-pattern>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>*</role-name>
+			
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Bestellungen nach Kunde suchen</web-resource-name>
+			<url-pattern>/bestellverwaltung/kunden/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Lieferung finden</web-resource-name>
+			<url-pattern>/bestellverwaltung/lieferungen/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+			<role-name>kunde</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Zahlungsart finden</web-resource-name>
+			<url-pattern>/bestellverwaltung/zahlungsart/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+			<role-name>kunde</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produkt erzeugen</web-resource-name>
+			<url-pattern>/articleManagement/produkte</url-pattern>
+			<http-method>POST</http-method>
+			<http-method>PUT</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produkt erzeugen form</web-resource-name>
+			<url-pattern>/articleManagement/produkte/form</url-pattern>
+			<http-method>POST</http-method>
+		<http-method>PUT</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produkt loeschen</web-resource-name>
+			<url-pattern>/articleManagement/produkte/*</url-pattern>
+			<http-method>DELETE</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Hersteller finden</web-resource-name>
+			<url-pattern>/articleManagement/hersteller/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+			<role-name>kunde</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produktkategorie finden</web-resource-name>
+			<url-pattern>/articleManagement/produktkategorie/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+			<role-name>kunde</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produktbewertung erzeugen</web-resource-name>
+			<url-pattern>/articleManagement/produktbewertungen</url-pattern>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>kunde</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produktbewertung löschen</web-resource-name>
+			<url-pattern>/articleManagement/produktbewertungen/*</url-pattern>
+			<http-method>DELETE</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Produktbewertung finden ueber ID</web-resource-name>
+			<url-pattern>/articleManagement/produktbewertung/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>admin</role-name>
+			<role-name>mitarbeiter</role-name>
+		</auth-constraint>
+	</security-constraint>
+-->
+
+	<security-role>
+		<role-name>admin</role-name>
+	</security-role>
+	<security-role>
+		<role-name>mitarbeiter</role-name>
+	</security-role>
+	<security-role>
+		<role-name>kunde</role-name>
+	</security-role>
+</web-app>

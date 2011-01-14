@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+<!--
+Teeeeest
+	Aufrufe:
+		1) mvn generate-sources          JAXB-Klassen generieren
+		2) mvn test                      Tests durchfuehren (mit bereits laufendem JBoss)
+		3) mvn -DskipTests=true site     Web-Site einschl. Testreport generieren
+
+	Allgemeine Pruefung bzgl. Updates:
+	    mvn versions:display-dependency-updates
+	    mvn versions:display-plugin-updates
+-->
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>en.webshop.test</groupId>
+	<artifactId>testWebshopREST</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0</version>
+	<name>testWebshopREST</name>
+	<url>http://www.iwi.hs-karlsruhe.de</url>
+	<inceptionYear>2011</inceptionYear>
+	<description>Testclient mit RESTEasy fuer einen RESTful Web Service</description>
+
+	<scm>
+		<developerConnection>scm:svn:http://www.iwi.hs-karlsruhe.de/svn/swe2-g02/testWebshopREST</developerConnection>
+		<url>http://www.iwi.hs-karlsruhe.de/svn/swe2-g02/testWebshopREST</url>
+	</scm>
+	
+	<organization>
+		<name>Hochschule Karlsruhe</name>
+		<url>http://www.hs-karlsruhe.de</url>
+	</organization>
+	
+	<developers>
+		<developer>
+			<id>Juergen.Zimmermann</id>
+			<name>J&#252;rgen Zimmermann</name>
+			<email>Juergen.Zimmermann@HS-Karlsruhe.de</email>
+			<url>http://www.iwi.hs-karlsruhe.de</url>
+			<organization>Hochschule Karlsruhe</organization>
+			<organizationUrl>http://www.iwi.hs-karlsruhe.de</organizationUrl>
+			<roles>
+				<role>Dozent</role>
+			</roles>
+			<timezone>+1</timezone>     <!-- relativ zu GMT -->
+		</developer>
+	</developers>
+
+	<properties>
+		<testklassen>**/*Test.java</testklassen>
+		
+		<rest.server.project>webshopEJB</rest.server.project>
+		<schema.dir>../${rest.server.project}/schema</schema.dir>
+		<gen.package.name>en.webshop.gen</gen.package.name>
+		<gen.dir.name>en/webshop/gen</gen.dir.name>
+		<dbunit.xml.dir>${basedir}/../webshopDB/target/dbunit</dbunit.xml.dir>
+		
+		<maven.version>3.0-SNAPSHOT</maven.version>
+		<java.version>1.6</java.version>
+		<java.minor.version>1.6.0-21</java.minor.version>
+		<resteasy.version>2.0.1.GA</resteasy.version>
+		<commons-httpclient.version>3.1</commons-httpclient.version>
+		<httpclient.version>4.0.3</httpclient.version>
+		<arquillian-jbossas-remote-6.version>1.0.0.Alpha4.SP1</arquillian-jbossas-remote-6.version>
+		<arquillian-junit.version>1.0.0.Alpha4.SP3</arquillian-junit.version>
+		<shrinkwrap.version>1.0.0-alpha-11</shrinkwrap.version>
+		<jboss-javaee-6.0.version>1.0.0.Beta7</jboss-javaee-6.0.version>
+		<jboss-as-client.version>6.0.0.20100911-M5</jboss-as-client.version>
+		<hibernate-jpamodelgen.version>1.1.0.Final</hibernate-jpamodelgen.version>
+		<hibernate-validator.version>4.1.0.Final</hibernate-validator.version>
+		
+		<junit.version>4.8.2</junit.version>
+		<dbunit.version>2.4.8</dbunit.version>
+		<slf4j.version>1.5.8</slf4j.version>
+		
+		<postgresql.driver.version>9.0-801.jdbc4</postgresql.driver.version>
+		<mysql.driver.version>5.1.13</mysql.driver.version>
+		
+		<maven-enforcer-plugin.version>1.0</maven-enforcer-plugin.version>
+		<maven-resources-plugin.version>2.4.3</maven-resources-plugin.version>
+		<maven-processor-plugin.version>1.3.7</maven-processor-plugin.version>
+		<maven-compiler-plugin.version>2.3.2</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>2.6</maven-surefire-plugin.version>
+		<maven-surefire-report-plugin.version>2.6</maven-surefire-report-plugin.version>
+		<maven-site-plugin.version>3.0-beta-3</maven-site-plugin.version>
+		<maven-jaxb2-plugin.version>0.7.4</maven-jaxb2-plugin.version>
+		<maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
+		<maven-antrun-plugin.version>1.6</maven-antrun-plugin.version>
+		
+		<maven-clean-plugin.version>2.4.1</maven-clean-plugin.version>
+		<maven-deploy-plugin.version>2.5</maven-deploy-plugin.version>
+		<maven-jar-plugin.version>2.3.1</maven-jar-plugin.version>
+		<maven-install-plugin.version>2.3.1</maven-install-plugin.version>
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>${resteasy.version}</version>
+			
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxb-provider</artifactId>
+			<version>${resteasy.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>${commons-httpclient.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.arquillian.container</groupId>
+			<artifactId>arquillian-jbossas-remote-6</artifactId>
+			<version>${arquillian-jbossas-remote-6.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.arquillian</groupId>
+			<artifactId>arquillian-junit</artifactId>
+			<version>${arquillian-junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+        <dependency>
+            <groupId>org.jboss.jbossas</groupId>
+            <artifactId>jboss-as-client</artifactId>
+            <version>${jboss-as-client.version}</version>
+            <type>pom</type>
+            
+            <!--
+            	Workaround: diese Abhaengigkeit endet intern bei Sun bei einem nicht-existierenden SNAPSHOT
+					1) org.jboss.jbossas:jboss-as-client:pom:6.0.0.20100721-M4
+					2) org.jboss.jbossas:jboss-as-iiop:jar:client:6.0.0.20100721-M4
+					3) org.jboss.jbossts:jbossjts:jar:4.11.0.Final
+					4) org.jboss.ws.native:jbossws-native-core:jar:3.3.0.CR1.SP2
+					5) com.sun.xml.ws:jaxws-rt:jar:2.2
+					6) com.sun.xml.ws:policy:jar:2.0-b01
+					7) com.sun.istack:istack-commons-runtime:jar:1.1-SNAPSHOT
+            -->
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.ws</groupId>
+					<artifactId>jaxws-rt</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
+
+		<dependency>
+			<groupId>com.sun.xml.ws</groupId>
+			<artifactId>jaxws-rt</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>${hibernate-jpamodelgen.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-api</artifactId>
+			<version>${shrinkwrap.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.shrinkwrap</groupId>
+			<artifactId>shrinkwrap-impl-base</artifactId>
+			<version>${shrinkwrap.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.spec</groupId>
+			<artifactId>jboss-javaee-6.0</artifactId>
+			<version>${jboss-javaee-6.0.version}</version>
+			<type>pom</type>
+		</dependency>
+				
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate-validator.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>${dbunit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${postgresql.driver.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql.driver.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>jboss.org</id>
+			<name>JBoss Repository for Maven</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
+		</repository>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Maven 2 Repository</name>
+			<url>http://download.java.net/maven/2</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss</id>
+			<name>JBoss Maven 2 Repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>maven2-repository.dev.java.net</id>
+			<url>http://download.java.net/maven/2</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
+  	<build>
+  		<defaultGoal>test-compile</defaultGoal>
+  		
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>${maven-enforcer-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>enforce-maven-environment</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<rules>
+						<requireMavenVersion>
+							<version>[${maven.version},)</version>
+						</requireMavenVersion>
+						<requireJavaVersion>
+							<version>${java.minor.version}</version>
+						</requireJavaVersion>
+						<requirePluginVersions/>
+					</rules>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>${maven-antrun-plugin.version}</version>
+				
+				<executions>
+					<execution>
+						<id>delete-old-generated-classes</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+
+						<configuration>
+							<target>
+								<delete failonerror="false" includeemptydirs="true"> 
+									<fileset dir="${basedir}/src/main/java/${gen.dir.name}"/> 
+								</delete> 
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>${maven-jaxb2-plugin.version}</version>
+
+				<configuration>
+					<schemaDirectory>${schema.dir}</schemaDirectory>
+					<schemaLanguage>XMLSCHEMA</schemaLanguage>
+					<generateDirectory>${basedir}/src/main/java</generateDirectory>
+					<verbose>true</verbose>
+					<extension>true</extension>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>generate-jaxb-classes-articleManagement</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						
+						<configuration>
+							<schemaIncludes>
+								<include>articleManagement.xsd</include>
+							</schemaIncludes>
+							<generatePackage>${gen.package.name}.articleManagement</generatePackage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-jaxb-classes-profileManagement</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						
+						<configuration>
+							<schemaIncludes>
+								<include>profileManagement.xsd</include>
+							</schemaIncludes>
+							<generatePackage>${gen.package.name}.profileManagement</generatePackage>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-jaxb-classes-orderManagement</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						
+						<configuration>
+							<schemaIncludes>
+								<include>orderManagement.xsd</include>
+							</schemaIncludes>
+							<generatePackage>${gen.package.name}.orderManagement</generatePackage>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>${maven-resources-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>copy-dbunit-files</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<!-- Flat XML-Dateien fuer DbUnit aus dem DB-Projekt umkopieren -->
+							<outputDirectory>${basedir}/src/test/resources</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${dbunit.xml.dir}</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- Generierung der Metamodel-Klassen (fuer Criteria Queries) -->
+			<plugin>
+				<groupId>org.bsc.maven</groupId>
+				<artifactId>maven-processor-plugin</artifactId>
+				<version>${maven-processor-plugin.version}</version>
+
+				<configuration>
+					<processors>
+						<processor>org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor</processor>
+					</processors>
+				</configuration>
+		
+				<executions>
+					<execution>
+						<id>generate-metamodel-classes</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>process</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<showDeprecation>true</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<encoding>UTF-8</encoding>
+					
+					<compilerArgument>-proc:none</compilerArgument>
+				</configuration>
+			</plugin>
+			
+			<!-- Plugin fuer Querverweise -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>${maven-jxr-plugin.version}</version>
+			</plugin>
+			
+			<!-- Durchfuehren der Tests mit Arquillian und JUnit -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+    			<artifactId>maven-surefire-plugin</artifactId>
+    			<version>${maven-surefire-plugin.version}</version>
+				
+				<configuration>
+					<redirectTestOutputToFile>true</redirectTestOutputToFile>
+					<trimStackTrace>false</trimStackTrace>
+					<printSummary>true</printSummary>
+					<includes>
+						<include>${testklassen}</include>
+					</includes>
+					<useFile>true</useFile>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>${maven-surefire-report-plugin.version}</version>
+				
+				<configuration>
+					<showSuccess>true</showSuccess>
+					<inputEncoding>UTF-8</inputEncoding>
+					<outputEncoding>UTF-8</outputEncoding>
+				</configuration>
+		
+				<executions>
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report-only</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>${maven-site-plugin.version}</version>
+				<configuration>
+					<locales>de</locales>
+					<outputEncoding>ISO-8859-1</outputEncoding>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>${maven-clean-plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${maven-jar-plugin.version}</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${maven-install-plugin.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven-deploy-plugin.version}</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+		
+		<resources>
+			<resource>
+				<directory>${ejb.src.dir}</directory>
+				<includes>
+					<include>META-INF/persistence.xml</include>
+				</includes>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+				<excludes>
+					<exclude>*.xsd</exclude>
+				</excludes>
+			</testResource>
+		</testResources>
+	</build>
+	
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>${maven-surefire-report-plugin.version}</version>
+				
+				<configuration>
+					<showSuccess>true</showSuccess>
+					<inputEncoding>UTF-8</inputEncoding>
+					<outputEncoding>UTF-8</outputEncoding>
+					
+					<packagesheader>Packages des Webshops</packagesheader>
+					<doctitle>Softwareentwicklung 2: Version ${project.version}</doctitle>
+					<windowtitle>Softwareentwicklung 2: Version ${project.version}</windowtitle>
+					<bottom>Copyright &#169; ${project.inceptionYear}-${currentYear} Hochschule Karlsruhe - Informatik und Wirtschaftsinformatik. All Rights Reserved.</bottom>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<!-- Generierung der HTML-Seiten mit Java-Quellcode und Querverweisen -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>${maven-jxr-plugin.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
+</project>
